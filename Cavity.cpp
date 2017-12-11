@@ -1,5 +1,20 @@
 #include "Cavity.h"
 
+/*  Cavity
+ *
+ */
+
+// Constructors
+
+// Functions
+int Cavity::ijk2n(int i , int j , int k) { return(0); };
+vector <int>  Cavity::n2ijk(int n) { return(vector<int>()); };
+
+/* Rectagular Cavity
+ *
+ */
+
+// Constructors
 RectangularCavity::RectangularCavity(string namei, double l , double w, double h ): 
     Cavity(namei) , xf(l) , yf(w) , zf(h) , xbins(100) , ybins(100) , zbins(100) {
         vector <double> pots = {0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0};
@@ -12,6 +27,7 @@ RectangularCavity::RectangularCavity(string namei, double l, double w, double h,
         setPotentials(pots);
 };
 
+// Functions
 RectangularCavity::RectangularCavity(string namei, double l , double w, double h , vector<double> boundaryPotentiali): 
     Cavity(namei) , xf(l) , yf(w) , zf(h) , xbins(100) , ybins(100) , zbins(100) {
         setPotentials(boundaryPotentiali);
@@ -56,5 +72,18 @@ vector <int>  RectangularCavity::n2ijk(int n) {
     ijk.push_back((n - ijk.at(0) - ijk.at(1)) / zbins);
 
     return(ijk);
+};
+
+void RectangularCavity::updateBoundaries() {
+
+    for (int n = 0; n < potential.size(); ++n) {
+        vector <int> bin = n2ijk(n);
+        if (bin.at(0) == xbins - 1 ) { potential.at(n) = farPotential;    }
+        if (bin.at(0) == 0         ) { potential.at(n) = nearPotential;   }
+        if (bin.at(1) == ybins - 1 ) { potential.at(n) = rightPotential;  }
+        if (bin.at(1) == 0         ) { potential.at(n) = leftPotential;   }
+        if (bin.at(2) == zbins - 1 ) { potential.at(n) = topPotential;    }
+        if (bin.at(2) == 0         ) { potential.at(n) = bottomPotential; }
+    }
 };
 

@@ -22,21 +22,28 @@ class Cavity {
     private:
         string name;
 
+    protected:
+        vector <double> potential;
+
     public:
         Cavity(string namei): name(namei) {};
        ~Cavity() {};
 
        string getName() { return(name); }; 
-
-
+       
+       // helper function for accesing mesh depends on cavity geometry
+       virtual  int ijk2n(int i , int j , int k);
+       virtual  vector <int>  n2ijk(int n);
 };
 
 class RectangularCavity : public Cavity {
     private:
+        // origin
         static constexpr double x0 = 0.0;
         static constexpr double y0 = 0.0;
         static constexpr double z0 = 0.0;
        
+        // other corner of 
         const double xf    , yf    , zf;
         const double xbins , ybins , zbins;
 
@@ -46,9 +53,7 @@ class RectangularCavity : public Cavity {
         double rightPotential;
         double nearPotential;
         double farPotential;
-
-        vector <double> Potential;
-
+        
     public:
         // constructors
         RectangularCavity(string namei, double length , double width, double height );
@@ -63,8 +68,8 @@ class RectangularCavity : public Cavity {
      
         // sets boundary conditions on mesh
         void updateBoundaries();
-
-        // helper function for accesing mesh
+        
+        // helper functions
         int ijk2n(int i , int j , int k);
         vector <int>  n2ijk(int n);
 
