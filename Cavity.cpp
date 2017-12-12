@@ -106,42 +106,52 @@ void RectangularCavity::updateBoundaries() {
 bool RectangularCavity::isBoundary(int n) {
     
     vector <int> bin = n2ijk(n);
-    
-    if ( bin.at(0) == xbins - 1 or  bin.at(0) == 0 or bin.at(1) == ybins - 1  
-     or bin.at(1) != 0  or  bin.at(2) != zbins - 1  or bin.at(2) != 0 ) {
-        return(true);
-    }
-    else {
-        return(false);
-    }
+
+    if (   bin.at(0) == xbins-1   or bin.at(0) == 0
+       or  bin.at(1) == ybins-1   or bin.at(1) == 0  
+       or  bin.at(2) == zbins-1   or bin.at(2) == 0 ) {return(true); }
+    else { return(false); }
 };
 
 int RectangularCavity::ijk2n(int i , int j , int k) {
 // bins are indexed from 0
-    return(k * xbins * ybins + j * xbins + i - 1);
+    return(k * xbins * ybins + j * xbins + i );
 };
 
 vector <int>  RectangularCavity::n2ijk(int n) {
 // bins are indexed from 0
 
     vector <int> ijk;
-    ijk.push_back(n / xbins);
-    ijk.push_back((n -ijk.at(0)) / ybins);
-    ijk.push_back((n - ijk.at(0) - ijk.at(1)) / zbins);
+    ijk.push_back(n % xbins);
+    ijk.push_back( (n % (xbins*ybins) ) / xbins);
+    ijk.push_back(n / (xbins * ybins) );
 
     return(ijk);
 };
 
 vector <double> RectangularCavity::getNeighbors(int n) {
-    vector <int> bin = n2ijk(n);
-    vector <double> neighbors;
+    vector<int> bins = n2ijk(n);
     
-    neighbors.push_back(potential.at( ijk2n(bin.at(0) + 1.0 , bin.at(1)       , bin.at(2)        ) ) );
-    neighbors.push_back(potential.at( ijk2n(bin.at(0) - 1.0 , bin.at(1)       , bin.at(2)        ) ) );
-    neighbors.push_back(potential.at( ijk2n(bin.at(0)       , bin.at(1) - 1.0 , bin.at(2)        ) ) );
-    neighbors.push_back(potential.at( ijk2n(bin.at(0)       , bin.at(1) - 1.0 , bin.at(2)        ) ) );
-    neighbors.push_back(potential.at( ijk2n(bin.at(0)       , bin.at(1)       , bin.at(2) + 1.0  ) ) );
-    neighbors.push_back(potential.at( ijk2n(bin.at(0)       , bin.at(1)       , bin.at(2) - 1.0  ) ) );
+    int i = bins.at(0);
+    int j = bins.at(1);
+    int k = bins.at(2);
+
+    int nfor= ijk2n(i+1,j,k);
+    int nback= ijk2n(i-1,j,k);
+    int nright= ijk2n(i,j+1,k);
+    int nleft =ijk2n(i,j-1,k);
+    int nup = ijk2n(i,j,k+1);   
+    int ndown = ijk2n(i,j,k-1);
+
+    
+    vector<double> neighbors;
+    neighbors.push_back( potential.at(nfor) );
+    neighbors.push_back( potential.at(nback) );
+    neighbors.push_back( potential.at(nright) );
+    neighbors.push_back( potential.at(nleft) );
+    neighbors.push_back( potential.at(nup) );
+    neighbors.push_back( potential.at(ndown) );
+
     
     return(neighbors);
 };
@@ -154,16 +164,31 @@ vector <int> RectangularCavity::getBins() {
 
 
 void RectangularCavity::writePotential() {
+    
+    std::cout << "Writing results to file "  << std::endl;
+//    std::cout << "xbins " << xbins  << std::endl;
+//    std::cout << "ybins " << ybins  << std::endl;
+//    std::cout << "zbins " << zbins  << std::endl;
+
+//    vector <double> potyy = getPotential();
+
+//    std::cout << "potsize " << potyy.size()  << std::endl;
 
     std::ofstream pot;
     pot.open(getName().append(".out"));
 
     int n;
 
-    for (int i = 1; i <= xbins; ++i) {
-        for (int j = 1; j <= ybins; ++j) {
-            for(int k = 1; k <= zbins; ++k) {
+    for (int i = 0; i < xbins; ++i) {
+        for (int j = 0; j < ybins; ++j) {
+            for(int k = 0; k < zbins; ++k) {
+//    std::cout << "i " << i  << std::endl;
+//    std::cout << "j " << j  << std::endl;
+//    std::cout << "k " << k  << std::endl;
                 n = ijk2n(i,j,k);
+//                std::cout << "n " << n  << std::endl;
+//                std::cout << "pot(n) " << getNthPotential(n) << std::endl;
+
                 pot << i << "," << j << "," << k << "," << getNthPotential(n) << std::endl;
             }
         }

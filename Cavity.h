@@ -16,6 +16,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cassert>
 
 using std::vector;
 using std::string;

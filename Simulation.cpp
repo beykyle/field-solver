@@ -1,7 +1,13 @@
 #include "Mesh.h"
 
 int main() {
-    RectangularCavity cavity( "washing_machine" , 10 , 4 , 4 , 10 , 4 , 4);
-    Mesh wash_mesh(cavity);
-    wash_mesh.solve("relax");
+    
+    RectangularCavity cavity( "my_rectangular_cavity2" , 10 , 5 , 5 , 100 , 50 , 50);
+    cavity.setTopPotential(1.0);
+    cavity.setBottomPotential(1.0);
+    cavity.setLeftPotential(0.5);
+    
+    Mesh mesh(cavity);
+    mesh.solve("relax");
 };
+

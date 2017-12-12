@@ -71,6 +71,8 @@ void Mesh::relax() {
     bool converge = false;
     int  count    = 0;
     vector<double> neighbors;
+    vector<double> oldPotential;
+    vector<double> diff;
 
     // while the simulation hasn't converged
     while (converge == false) {
@@ -80,15 +82,14 @@ void Mesh::relax() {
             if (cavity->isBoundary(n) == false) {
                 // do relaxation on this bin
                 neighbors = cavity->getNeighbors(n);
-                cavity->setPotential(n , mean(neighbors));
+                cavity->setPotential(n , mean(neighbors));               
             }
         }
         count++;
         
         // every 5 steps re-evaluate convergence
-        if (count % 5 == 0) {
-            // convergence criteria
-            converge = true; 
+        if (count % 10 == 0) {
+                converge = true; 
         }
     } 
 };
