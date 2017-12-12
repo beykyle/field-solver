@@ -14,6 +14,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <iostream>
+#include <fstream>
 
 using std::vector;
 using std::string;
@@ -26,14 +28,25 @@ class Cavity {
         vector <double> potential;
 
     public:
-        Cavity(string namei): name(namei) {};
+        Cavity(string namei ): name(namei) {};
        ~Cavity() {};
 
-       string getName() { return(name); }; 
+       virtual string getName() { return(name); }; 
        
-       // helper function for accesing mesh depends on cavity geometry
+       vector <double> getPotential() {return(potential); };
+
+       double getNthPotential(int n)          {return(potential.at(n)); };
+       void setPotential(int n , double val)  { potential.at(n) = val;  };
+       
+       // utility functions for accesing mesh 
        virtual  int ijk2n(int i , int j , int k);
        virtual  vector <int>  n2ijk(int n);
+       virtual  bool isBoundary(int n) { return(false); };
+       virtual  vector <double> getNeighbors(int n);
+       virtual  vector <int>  getBins();
+        
+       // writer
+       virtual void writePotential();
 };
 
 class RectangularCavity : public Cavity {
@@ -45,7 +58,7 @@ class RectangularCavity : public Cavity {
        
         // other corner of 
         const double xf    , yf    , zf;
-        const double xbins , ybins , zbins;
+        const int xbins , ybins , zbins;
 
         double topPotential;
         double bottomPotential;
@@ -69,15 +82,22 @@ class RectangularCavity : public Cavity {
         // sets boundary conditions on mesh
         void updateBoundaries();
         
-        // helper functions
+        // writer
+        void writePotential();
+
+        // utility functions
         int ijk2n(int i , int j , int k);
         vector <int>  n2ijk(int n);
+        bool isBoundary(int n);
+        vector <double> getNeighbors(int n);
 
         // get/set functions
         double getLength() { return(xf); };
         double getWidth()  { return(yf); };
         double getHeight() { return(zf); };
 
+        vector <int>  getBins();
+     
         void setTopPotential(double in)     { topPotential    = in;  updateBoundaries(); };
         void setBottomPotential(double in)  { bottomPotential = in;  updateBoundaries(); };
         void setLeftPotential(double in)    { leftPotential   = in;  updateBoundaries(); };
@@ -91,9 +111,8 @@ class RectangularCavity : public Cavity {
         double getRightPotential()          { return(topPotential); };
         double getNearPotential()           { return(topPotential); };
         double getFarPotential()            { return(topPotential); };
- 
-        vector <double> getPotentials();
-        void setPotentials( vector <double> potentials);
         
+        vector <double> getBoundPotentials();
+        void setBoundPotentials(vector <double> potentials );
 };
 #endif
