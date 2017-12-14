@@ -67,7 +67,7 @@ void Mesh::solve(string method) {
     }
 };
         
-void Mesh::relax() {
+void Mesh::relax( ) {
     bool converge = false;
     int  count    = 0;
     vector<double> neighbors;
@@ -88,7 +88,7 @@ void Mesh::relax() {
         count++;
         
         // every 5 steps re-evaluate convergence
-        if (count % 10 == 0) {
+        if (count % 50 == 0) {
                 converge = true; 
         }
     } 
