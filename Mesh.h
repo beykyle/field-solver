@@ -14,26 +14,34 @@
 #include <vector>
 #include <iostream>
 
+#include "Utilities.h"
 #include "Cavity.h"
 
 using std::vector;
 using std::string;
 
-typedef std::shared_ptr<RectangularCavity> Cavity_ptr;
+typedef std::shared_ptr<RectangularCavity> RectangularCavity_ptr;
 
 class Mesh {
     private:
-        Cavity_ptr cavity;
+        RectangularCavity_ptr cavity;
 
     public:
-        Mesh(RectangularCavity cavityi): cavity( std::make_shared< RectangularCavity >( cavityi ) ) {};
+        Mesh(RectangularCavity cavIn ): cavity( std::make_shared<RectangularCavity>(cavIn)) {};
        ~Mesh() {}; 
-
+        
+        string getName() { return(cavity->getName() ); };
+        
         // running function
-        void solve(string method); // allowed methods: 'relax', 'fft', 'matrix', 'Green', 'fmm' , 'finite_element', 'monte_carlo'
+        void solve(string method); 
+        // allowed methods: 'relax', 'fft', 'matrix', 
+        //'Green', 'fmm' , 'finite_element', 'monte_carlo'
         
         // solvers
         void relax();
+
+        // Electric field
+        void getField();
 
 };
 

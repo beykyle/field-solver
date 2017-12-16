@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-// Utilities
+// other functions
 enum string_code {
         eRelax,
         eFFT,
@@ -19,16 +19,8 @@ string_code hashit (std::string const& inString) {
         if (inString == "fmm"            )   return eFMM;
         if (inString == "finite_element" )   return eFinite;
         if (inString == "monte_carlo"    )   return eMonte;
-}
-
-double mean(vector <double> values) {
-    double sum = 0.0;
-    for (auto v : values) {
-        sum += v;
-    };
-
-    return(sum / double(values.size()) );
 };
+
 
 // Constructrs
 
@@ -66,30 +58,45 @@ void Mesh::solve(string method) {
         cavity->writePotential();
     }
 };
-        
+
+
 void Mesh::relax( ) {
-    bool converge = false;
-    int  count    = 0;
-    vector<double> neighbors;
-    vector<double> oldPotential;
-    vector<double> diff;
+    bool  converge   = false;
+    int   count      = 0;
+    int   wcount     = 0;
+    int   size       = cavity->getPotential().size();
+
+    vector <double>  neighbors;
+    vector <double>  diff = {1.0};
+    vector <double>  oldPot;
 
     // while the simulation hasn't converged
     while (converge == false) {
-        std::cout << "Doing relaxation..." << std::endl;
+        // every 3 steps store current potential
+        if (count % 3 == 0) {
+            oldPot = cavity->getPotential();
+        }
         // iterate over non-boundary bins
         for (int n = 0; n < cavity->getPotential().size(); ++n) {
             if (cavity->isBoundary(n) == false) {
                 // do relaxation on this bin
                 neighbors = cavity->getNeighbors(n);
-                cavity->setPotential(n , mean(neighbors));               
+                cavity->setPotential(n , mean(neighbors));
             }
         }
-        count++;
-        
-        // every 5 steps re-evaluate convergence
-        if (count % 50 == 0) {
-                converge = true; 
+        count++;   
+        // every 3 steps re-evaluate convergence
+        if (count % 3 == 0) {
+            
+            converge = testConvergence(oldPot , cavity->getPotential() , diff , 0.01 );
+            
+            std::cout << "<";
+            wcount = (count/3 > 20 ? count - 60 : count);
+            for (int i = 0; i < wcount/3; ++i)      {std::cout << "=="; }
+            for (int i = 1; i < 20 - wcount/3 - 1; ++i) {std::cout << "  ";  }
+            std::cout << "Doing relaxation... step: " << count 
+                      << ", normalized L2: " << diff.at(diff.size() - 1 )  << std::endl;
+    
         }
     } 
 };

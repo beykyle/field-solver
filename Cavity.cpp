@@ -136,21 +136,33 @@ vector <double> RectangularCavity::getNeighbors(int n) {
     int j = bins.at(1);
     int k = bins.at(2);
 
-    int nfor= ijk2n(i+1,j,k);
-    int nback= ijk2n(i-1,j,k);
-    int nright= ijk2n(i,j+1,k);
-    int nleft =ijk2n(i,j-1,k);
-    int nup = ijk2n(i,j,k+1);   
-    int ndown = ijk2n(i,j,k-1);
-
-    
     vector<double> neighbors;
-    neighbors.push_back( potential.at(nfor) );
-    neighbors.push_back( potential.at(nback) );
-    neighbors.push_back( potential.at(nright) );
-    neighbors.push_back( potential.at(nleft) );
-    neighbors.push_back( potential.at(nup) );
-    neighbors.push_back( potential.at(ndown) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j  ,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j+1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j-1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j  ,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j+1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j-1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j+1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j-1,k  )) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j  ,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j+1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j-1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j  ,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j+1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j-1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j+1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j-1,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j  ,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j+1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i+1,j-1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j  ,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j+1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i-1,j-1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j+1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j-1,k-1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j  ,k+1)) );
+    neighbors.push_back( getNthPotential(ijk2n(i  ,j  ,k-1)) );
 
     
     return(neighbors);
@@ -166,14 +178,6 @@ vector <int> RectangularCavity::getBins() {
 void RectangularCavity::writePotential() {
     
     std::cout << "Writing results to file "  << std::endl;
-//    std::cout << "xbins " << xbins  << std::endl;
-//    std::cout << "ybins " << ybins  << std::endl;
-//    std::cout << "zbins " << zbins  << std::endl;
-
-//    vector <double> potyy = getPotential();
-
-//    std::cout << "potsize " << potyy.size()  << std::endl;
-
     std::ofstream pot;
     pot.open(getName().append(".out"));
 
@@ -182,13 +186,7 @@ void RectangularCavity::writePotential() {
     for (int i = 0; i < xbins; ++i) {
         for (int j = 0; j < ybins; ++j) {
             for(int k = 0; k < zbins; ++k) {
-//    std::cout << "i " << i  << std::endl;
-//    std::cout << "j " << j  << std::endl;
-//    std::cout << "k " << k  << std::endl;
                 n = ijk2n(i,j,k);
-//                std::cout << "n " << n  << std::endl;
-//                std::cout << "pot(n) " << getNthPotential(n) << std::endl;
-
                 pot << i << "," << j << "," << k << "," << getNthPotential(n) << std::endl;
             }
         }
