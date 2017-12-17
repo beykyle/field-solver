@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <time.h>
 
 // other functions
 enum string_code {
@@ -31,7 +32,6 @@ void Mesh::solve(string method) {
 // allowed methods: 'relax', 'fft', 'matrix', 'green', 'fmm' , 'finite_element', 'monte_carlo'
     std::cout << "Running " << method << " on " << cavity->getName() << std::endl;
     bool write = true;
-
     switch( hashit(method)) {
         case eRelax :
             relax();
@@ -54,9 +54,12 @@ void Mesh::solve(string method) {
             break;
     }
 
-    if(write == true) {
+    if (write = true) {
         cavity->writePotential();
-    }
+        cavity->calculateE();
+        cavity->writeE();
+    };
+
 };
 
 
@@ -70,10 +73,13 @@ void Mesh::relax( ) {
     vector <double>  diff = {1.0};
     vector <double>  oldPot;
 
+    clock_t t;
+
     // while the simulation hasn't converged
     while (converge == false) {
         // every 3 steps store current potential
         if (count % 3 == 0) {
+            t = clock();
             oldPot = cavity->getPotential();
         }
         // iterate over non-boundary bins
@@ -88,14 +94,16 @@ void Mesh::relax( ) {
         // every 3 steps re-evaluate convergence
         if (count % 3 == 0) {
             
-            converge = testConvergence(oldPot , cavity->getPotential() , diff , 0.01 );
+            converge = testConvergence(oldPot , cavity->getPotential() , diff , 0.001 );
             
             std::cout << "<";
             wcount = (count/3 > 20 ? count - 60 : count);
             for (int i = 0; i < wcount/3; ++i)      {std::cout << "=="; }
             for (int i = 1; i < 20 - wcount/3 - 1; ++i) {std::cout << "  ";  }
+            t = t - clock();
             std::cout << "Doing relaxation... step: " << count 
-                      << ", normalized L2: " << diff.at(diff.size() - 1 )  << std::endl;
+                      << ", normalized L2: " << diff.at(diff.size() - 1 )  
+                      << ", time: " << ((float)t)/CLOCKS_PER_SEC  << std::endl;
     
         }
     } 

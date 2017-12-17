@@ -27,15 +27,17 @@ class Cavity {
 
     protected:
         vector <double> potential;
+        vector <double> Ex;
+        vector <double> Ey;
+        vector <double> Ez;
 
     public:
         Cavity(string namei ): name(namei) {};
        ~Cavity() {};
 
+       // get/set
        virtual string getName() { return(name); }; 
-       
        vector <double> getPotential() {return(potential); };
-
        double getNthPotential(int n)          {return(potential.at(n)); };
        void setPotential(int n , double val)  { potential.at(n) = val;  };
        
@@ -45,9 +47,13 @@ class Cavity {
        virtual  bool isBoundary(int n) { return(false); };
        virtual  vector <double> getNeighbors(int n);
        virtual  vector <int>  getBins();
-        
+       
+       // find electric field
+       virtual void calculateE();
+
        // writer
        virtual void writePotential();
+       virtual void writeE();
 };
 
 class RectangularCavity : public Cavity {
@@ -85,6 +91,10 @@ class RectangularCavity : public Cavity {
         
         // writer
         void writePotential();
+        void writeE();
+
+        // find electrci field 
+        void calculateE();
 
         // utility functions
         int ijk2n(int i , int j , int k);
