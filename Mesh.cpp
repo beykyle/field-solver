@@ -176,7 +176,7 @@ void Mesh::relax() {
         t = clock();
         // iterate over non-boundary bins
         for (int n = 0; n < potential.size(); ++n) {
-            if (onBoundary.at(n) == false and geoBoundary.at(n) == false) {
+            if (onBoundary.at(n) == false ) {
                 // do relaxation on this bin
                 neighbors = getNeighbors(n);
                 potential.at(n) =  mean(neighbors);
@@ -186,7 +186,7 @@ void Mesh::relax() {
         // every 3 steps re-evaluate convergence
         if ((count+1) % 3 == 0) {
 
-            converge = testConvergence(oldPot , potential , diff , 0.01 );
+            converge = testConvergence(oldPot , potential , diff , 0.005 );
             
             std::cout << "<";
             wcount = (count/3 > 18 ? 18  : count);
@@ -209,32 +209,33 @@ vector <double> Mesh::getNeighbors(int n) {
     int k = bins.at(2);
 
     vector<double> neighbors;
-    neighbors.push_back( potential.at( ijk2n(i+1,j  ,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j+1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j-1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j  ,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j+1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j-1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j+1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j-1,k  ) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j  ,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j+1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j-1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j  ,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j+1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j-1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j+1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j-1,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j  ,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j+1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i+1,j-1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j  ,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j+1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i-1,j-1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j+1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j-1,k-1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j  ,k+1) ) );
-    neighbors.push_back( potential.at( ijk2n(i  ,j  ,k-1) ) );
+    
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j  ,k  ) ) );}  catch (const std::out_of_range& e){}
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j+1,k  ) ) );}  catch (const std::out_of_range& e){}
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j-1,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j  ,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j+1,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j-1,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j+1,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j-1,k  ) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j  ,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j+1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j-1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j  ,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j+1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j-1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j+1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j-1,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j  ,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j+1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i+1,j-1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j  ,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j+1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i-1,j-1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j+1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j-1,k-1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j  ,k+1) ) );}  catch (const std::out_of_range& e){} 
+    try{neighbors.push_back( potential.at( ijk2n(i  ,j  ,k-1) ) );}  catch (const std::out_of_range& e){} 
  
     return(neighbors);
 };

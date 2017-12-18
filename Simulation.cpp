@@ -18,8 +18,10 @@ int main() {
 
 //    myCavity.setFarPotential(100.0);
 //    myCavity.setNearPotential(100.0);
-    myCavity.setLeftPotential(100.0);
-    myCavity.setRightPotential(-100.0);
+    myCavity.setLeftPotential(200.0);
+    myCavity.setRightPotential(0.0);
+    myCavity.setNearPotential(300.0);
+    myCavity.setBottomPotential(500.0);
     
     RectangularCavity_ptr myCavityPtr = std::make_shared<RectangularCavity>(myCavity);
     
