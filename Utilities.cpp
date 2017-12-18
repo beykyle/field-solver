@@ -29,6 +29,7 @@ double dot(vector <double> vals1 , vector <double> vals2) {
 
 double normL2(vector <double> vals1 , vector <double> vals2 ) {
     if (vals1.size() != vals2.size() ) {
+        std::cerr << "Cannot do L2 with vectors of size " << vals1.size() << " and " << vals2.size() << std::endl;
         std::cerr << "Runtime error: normL2() requires vectors of the same size" <<std::endl;
     }
     
@@ -38,6 +39,10 @@ double normL2(vector <double> vals1 , vector <double> vals2 ) {
     for (int i = 0; i < vals1.size(); ++i) {
         runningDiff  += pow(vals1.at(i) -  vals2.at(i),2);
         runningProd1 +=  pow(vals1.at(i) , 2) +  pow(vals2.at(i) , 2);
+    }
+
+    if (runningProd1 == 0) {
+        std::cerr << "Runtime error: normL2() requires non-zero vectors" <<std::endl;
     }
 
     return( pow( (runningDiff / runningProd1 ) , 0.5) );
@@ -55,8 +60,6 @@ bool testConvergence(vector <double> oldPot , vector<double> currentPot , vector
     if (( pow( diff.at(diff.size() -1) - diff.at(diff.size() - 2) , 2) ) < pow(condition,2) ) {
         converge = true;
     };
-
-
 
     return(converge);
 

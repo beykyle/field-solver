@@ -25,48 +25,24 @@ class Cavity {
     private:
         string name;
 
-    protected:
-        vector <double> potential;
-        vector <double> Ex;
-        vector <double> Ey;
-        vector <double> Ez;
-
     public:
         Cavity(string namei ): name(namei) {};
        ~Cavity() {};
 
        // get/set
-       virtual string getName() { return(name); }; 
-       vector <double> getPotential() {return(potential); };
-       double getNthPotential(int n)          {return(potential.at(n)); };
-       void setPotential(int n , double val)  { potential.at(n) = val;  };
-       
-       // utility functions for accesing mesh 
-       virtual  int ijk2n(int i , int j , int k);
-       virtual  vector <int>  n2ijk(int n);
-       virtual  bool isBoundary(int n) { return(false); };
-       virtual  vector <double> getNeighbors(int n);
-       virtual  vector <int>  getBins();
-       
-       // find electric field
-       virtual void calculateE();
+       string getName() { return(name); }; 
 
-       // writer
-       virtual void writePotential();
-       virtual void writeE();
+       // interface with mesh
+       virtual void boundaries2Mesh(vector <int> bins , vector <double> &boundaries , vector <double> &potential) {};
+           
 };
 
 class RectangularCavity : public Cavity {
     private:
-        // origin
-        static constexpr double x0 = 0.0;
-        static constexpr double y0 = 0.0;
-        static constexpr double z0 = 0.0;
-       
-        // other corner of 
-        const double xf    , yf    , zf;
-        const int xbins , ybins , zbins;
+        // rectangle side lengths
+        vector <double> lens;
 
+        // boundary conditions
         double topPotential;
         double bottomPotential;
         double leftPotential;
@@ -74,56 +50,42 @@ class RectangularCavity : public Cavity {
         double nearPotential;
         double farPotential;
         
+        bool topPotentialHold;
+        bool bottomPotentialHold;
+        bool leftPotentialHold;
+        bool rightPotentialHold;
+        bool nearPotentialHold;
+        bool farPotentialHold;
+        
     public:
         // constructors
-        RectangularCavity(string namei, double length , double width, double height );
-        RectangularCavity(string namei, double length , double width, double height , int i , int j , int k);
-        RectangularCavity(string namei, double length , double width, double height , 
-                vector <double> boundaryPotentiali);
-        RectangularCavity(string namei, double length , double width, double height , int i , int j , int k, 
-                vector <double> boundaryPotentiali);
+        RectangularCavity(string namei, vector <double> lensi): Cavity(namei) , lens(lensi) {};
 
         // destructor
         ~RectangularCavity() {};
      
         // sets boundary conditions on mesh
-        void updateBoundaries();
+        void boundaries2Mesh(vector <int> bins , vector <bool> &geoBoundaries , vector <bool> &boundaries, 
+                             vector <double> &potential);
         
-        // writer
-        void writePotential();
-        void writeE();
-
-        // find electrci field 
-        void calculateE();
-
-        // utility functions
-        int ijk2n(int i , int j , int k);
-        vector <int>  n2ijk(int n);
-        bool isBoundary(int n);
-        vector <double> getNeighbors(int n);
-
         // get/set functions
-        double getLength() { return(xf); };
-        double getWidth()  { return(yf); };
-        double getHeight() { return(zf); };
+            // get/set rectangle side lengths
+        vector <double>  getLens() { return(lens); };
 
-        vector <int>  getBins();
-     
-        void setTopPotential(double in)     { topPotential    = in;  updateBoundaries(); };
-        void setBottomPotential(double in)  { bottomPotential = in;  updateBoundaries(); };
-        void setLeftPotential(double in)    { leftPotential   = in;  updateBoundaries(); };
-        void setRightPotential(double in)   { rightPotential  = in;  updateBoundaries(); };
-        void setNearPotential(double in)    { nearPotential   = in;  updateBoundaries(); };
-        void setFarPotential(double in)     { farPotential    = in;  updateBoundaries(); };
+            // get/set boundary conditions
+        void setTopPotential(double in)     { topPotential    = in; topPotentialHold     = true;   };
+        void setBottomPotential(double in)  { bottomPotential = in; bottomPotentialHold  = true;  };
+        void setLeftPotential(double in)    { leftPotential   = in; leftPotentialHold    = true;  };
+        void setRightPotential(double in)   { rightPotential  = in; rightPotentialHold   = true;  };
+        void setNearPotential(double in)    { nearPotential   = in; nearPotentialHold    = true;  };
+        void setFarPotential(double in)     { farPotential    = in; farPotentialHold     = true;  };
 
-        double getTopPotential()            { return(topPotential); };
-        double getBottomPotential()         { return(topPotential); };
-        double getLeftPotential()           { return(topPotential); };
-        double getRightPotential()          { return(topPotential); };
-        double getNearPotential()           { return(topPotential); };
-        double getFarPotential()            { return(topPotential); };
+        double getTopPotential()            { return(topPotential);    };
+        double getBottomPotential()         { return(bottomPotential); };
+        double getLeftPotential()           { return(leftPotential);   };
+        double getRightPotential()          { return(rightPotential);  };
+        double getNearPotential()           { return(nearPotential);   };
+        double getFarPotential()            { return(farPotential);    };
         
-        vector <double> getBoundPotentials();
-        void setBoundPotentials(vector <double> potentials );
 };
 #endif

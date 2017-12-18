@@ -26,10 +26,24 @@ class Mesh {
     private:
         RectangularCavity_ptr cavity;
 
+        vector <int> bins;
+
+        vector <double> potential;
+        vector <double> Ey;
+        vector <double> Ex;
+        vector <double> Ez;
+
+        vector <bool> onBoundary;  // bins where potential is held by boundar condition
+        vector <bool> geoBoundary; // bins at the geometric boundary of the cavity
+
     public:
-        Mesh(RectangularCavity cavIn ): cavity( std::make_shared<RectangularCavity>(cavIn)) {};
+        // constructor
+        Mesh(RectangularCavity_ptr cavIn , vector <int> binsi);
+
+        // destructor
        ~Mesh() {}; 
         
+       // get name of associated cavity
         string getName() { return(cavity->getName() ); };
         
         // running function
@@ -41,7 +55,19 @@ class Mesh {
         void relax();
 
         // Electric field
-        void getField();
+        void calculateE(vector <double> binWidths);
+
+        // functions for operations on grid
+        int ijk2n(int i , int j, int k);
+
+        vector <int> n2ijk(int n);
+
+        vector <double> getNeighbors(int n);
+
+        // writers
+        void writeE();
+        void writePotential();
+
 
 };
 

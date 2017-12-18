@@ -5,11 +5,25 @@
 int main() {
     clock_t t;
 
-    RectangularCavity myCavity( "cCav" , 1 , 1 , 1 , 50 , 50 , 50);
-    myCavity.setTopPotential(100.00);
-    myCavity.setLeftPotential(100.00);
     
-    Mesh mesh(myCavity );
+    vector <double> binWidths;
+    vector <double> cavityDimensions = { 1.0  , 1.0 , 1.0 }; // rectangular cavity
+    vector <int>    bins             = { 50   , 50 , 50 }; // number of bins in each dimension
+    
+    binWidths.push_back(cavityDimensions.at(0) / double(bins.at(0)) );
+    binWidths.push_back(cavityDimensions.at(1) / double(bins.at(1)) );
+    binWidths.push_back(cavityDimensions.at(2) / double(bins.at(2)) );
+
+    RectangularCavity myCavity( "cCav" , cavityDimensions);
+
+//    myCavity.setFarPotential(100.0);
+//    myCavity.setNearPotential(100.0);
+    myCavity.setLeftPotential(100.0);
+    myCavity.setRightPotential(-100.0);
+    
+    RectangularCavity_ptr myCavityPtr = std::make_shared<RectangularCavity>(myCavity);
+    
+    Mesh mesh( myCavityPtr , bins );
 
     t = clock();
     mesh.solve("relax");
@@ -17,9 +31,10 @@ int main() {
     
     std::cout<<"Solved for Phi in " << ((float)t)/CLOCKS_PER_SEC << " seconds" << std::endl;
     
+    mesh.calculateE(binWidths);
+    mesh.writeE();
+    mesh.writePotential();
 
-
-  //  myCavity.writePotential();
-  //  myCavity.writeE();
+    return(0);
 };
 
