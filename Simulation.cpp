@@ -2,6 +2,10 @@
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
 
 
+bool to_bool(std::string const& s) {
+         return s != "0";
+}
+
 // functions
 bool Simulation::readInput(std::string XML_FILE_PATH , vector<int> &bins, vector<double> &boundaryPotentials , 
         vector <bool> &holdPotentials , vector <double> &cavityDimensions , std::string &shape , 
@@ -15,6 +19,7 @@ bool Simulation::readInput(std::string XML_FILE_PATH , vector<int> &bins, vector
     std::string tmpDim;
     std::string tmpBin;
     std::string tmpPot;
+    std::string tmpHold;
 
     // load document
     pugi::xml_document doc;
@@ -38,6 +43,9 @@ bool Simulation::readInput(std::string XML_FILE_PATH , vector<int> &bins, vector
         for (pugi::xml_node child: cavity.children("boundaryPotentials")) {
             tmpPot = child.child_value();
         }
+        for (pugi::xml_node child: cavity.children("fixedPotentials")) {
+            tmpHold = child.child_value();
+        }
     }      
           
     // parse mesh
@@ -46,7 +54,7 @@ bool Simulation::readInput(std::string XML_FILE_PATH , vector<int> &bins, vector
             tmpBin  = child.child_value();
         }
         for (pugi::xml_node child: mesh.children("method")) {
-            method  = child.value();
+            method  = child.child_value();
         }
     }
    
@@ -69,6 +77,13 @@ bool Simulation::readInput(std::string XML_FILE_PATH , vector<int> &bins, vector
         std::string substr;
         getline(ls , substr , ',');
         boundaryPotentials.push_back(stod(substr));
+    }
+    
+    std::stringstream rs(tmpHold);
+    while( rs.good() ) {
+        std::string substr;
+        getline(rs , substr , ',');
+        holdPotentials.push_back(to_bool(substr));
     }
 
     holdPotentials.assign(boundaryPotentials.size() , true); //TODO fix this 
@@ -108,10 +123,12 @@ bool Simulation::setupFromInputFiles(vector <std::string> paths ) {
         
         // read from input file
         goodRead = readInput(XML_FILE_PATH , bins , boundaryPotentials , holdPotentials , 
-                cavityDimensions , shape , name , method);
+                cavityDimensions ,  name , shape , method); //TODO why do name and shape switch?
 
+        std::cout << "Setting up Cavity: " << name << ", with shape " << shape << std::endl;
+        
         if (goodRead == false) {
-            std::cerr << "Trouble with input file " << counter+1 << std::endl;
+            std::cerr << "Trouble with input file " << counter << std::endl;
             return(false);
         }
         else {
@@ -121,37 +138,40 @@ bool Simulation::setupFromInputFiles(vector <std::string> paths ) {
             binWidths.push_back(cavityDimensions.at(1) / double(bins.at(1)) );
             binWidths.push_back(cavityDimensions.at(2) / double(bins.at(2)) );
 
-            if (shape.compare(std::string("Rectangular")) != 0) {
+            if (shape.compare(std::string("Rectangular")) == 0) {
+                RectangularCavity myCavity( name , cavityDimensions , boundaryPotentials , holdPotentials);
         
-            RectangularCavity myCavity( name , cavityDimensions , boundaryPotentials , holdPotentials);
+                // make a pointer to the cavity, upcasting cavity type
+                Cavity_Ptr myCavityPtr = std::make_shared<RectangularCavity>(myCavity);
         
-            // make a pointer to the cavity, upcasting cavity type
-            Cavity_Ptr myCavityPtr = std::make_shared<RectangularCavity>(myCavity);
+                // add cavity to the simulation
+                cavitySet.push_back(myCavityPtr);
+
+                // construct and set Mesh
+                Mesh mesh(myCavityPtr, bins , binWidths);
+
+                // make a pointer to the mesh
+                myMeshPtr = std::make_shared<Mesh>(mesh);
         
+                // add mesh to the simulation
+                meshSet.push_back(myMeshPtr);
+    
+                // specify solve method for this mesh
+                methodSet.push_back(method);
             }
+            
             else {
-                std::cerr << "Error! cavity type not recognized. quitting." << std::endl;
+                std::cerr << "Error! cavity type not recognized for input file " << counter << ". quitting." << std::endl;
+                std::cout << "Error! cavity type not recognized for input file " << counter << ". quitting." << std::endl;
                 return(false);
             }
 
-            // add cavity to the simulation
-            cavitySet.push_back(myCavityPtr);
-
-            // construct and set Mesh
-            Mesh mesh(myCavityPtr, bins , binWidths);
-
-            // make a pointer to the mesh
-            myMeshPtr = std::make_shared<Mesh>(mesh);
-        
-            // add mesh to the simulation
-            meshSet.push_back(myMeshPtr);
-    
-            // specify solve method for this mesh
-            methodSet.push_back(method);
         }
 
         ++counter;
     }
+
+    return(true);
 
 };
 
@@ -163,15 +183,17 @@ void Simulation::run() {
 
     for(int i = 0; i < meshSet.size(); ++i) {
         
-        std::cout << std::endl << " Beginning solve for Cavity " << i + 1 << std::endl;
+        std::cout << std::endl << " Beginning solve for Cavity " << i + 1 << ": " 
+                  << cavitySet.at(i)->getName() << " using " << methodSet.at(i) <<std::endl;
         
         // run and time field solve
         t = clock();
         meshSet.at(i)->solve(methodSet.at(i));
         t = clock() - t;
+
+        std::cout <<"Solved cavity " << i +1 << ": " << cavitySet.at(i)->getName() 
+                  << " in " << ((float)t)/CLOCKS_PER_SEC << " seconds" << std::endl;
         
-        std::cout<<"Solved cavity " << i +1 << " in " << ((float)t)/CLOCKS_PER_SEC << " seconds" << std::endl;
-    
         // calculate E
         meshSet.at(i)->calculateE();
 

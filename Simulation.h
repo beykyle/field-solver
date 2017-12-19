@@ -36,12 +36,14 @@ class Simulation {
        ~Simulation() {};
 
        void run();
-
-        bool readInput(std::string XML_FILE_PATH , vector<int> &bins, vector<double> &boundaryPotentials , 
+       
+       bool readInput(std::string XML_FILE_PATH , vector<int> &bins, vector<double> &boundaryPotentials , 
                 vector <bool> &holdPotentials , vector <double> &cavityDimensions , std::string &shape , 
                 std::string &name , std::string &method);
+       
+       bool setupFromInputFiles( vector <std::string> paths); 
 
-        bool setupFromInputFiles( vector <std::string> paths); 
+       Cavity getCavity(int i ) { return( *cavitySet.at(i) ); };
 };
 
 #endif

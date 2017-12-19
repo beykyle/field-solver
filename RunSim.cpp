@@ -26,10 +26,15 @@ int main(int argc , char** argv) {
     Simulation mySim;
     
     // setup simulation according to filenames
-    mySim.setupFromInputFiles(filenames);
+    bool good = mySim.setupFromInputFiles(filenames);
 
-    // run simulation
-    // mySim.run()
+    if (good == true) {
+        // run simulation
+         mySim.run();
+    }
+    else {
+        std::cout << "Simulation failed due to error in input file parsing " << std::endl;
+    }
     
     return(0);
 };

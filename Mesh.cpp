@@ -33,15 +33,8 @@ Mesh::Mesh(Cavity_ptr cavIn , vector<int> binsi , vector <double> binwidths) {
     vector <bool>   inBound(bins.at(0)*bins.at(1)*bins.at(2) , false);
     vector <bool>   geoBound(bins.at(0)*bins.at(1)*bins.at(2) , false);
 
-    std::cout << "bins " << bins.at(0) << " " << bins.at(1) << " " << bins.at(2) << std::endl;
-    std::cout << "potsize " << pot.size() << " pots() " << pot.at(3) << std::endl;
-    std::cout << "insize " << inBound.size() << " in() " << inBound.at(3) << std::endl;
-    std::cout << "geosize " << geoBound.size() << " geo() " << geoBound.at(3) << std::endl;
-    
     cavity->boundaries2Mesh(bins , geoBound , inBound , pot);
 
-    std::cout << "made it this far " << std::endl;
-    
     potential  = pot;
     onBoundary = inBound;
     geoBoundary = geoBound;
