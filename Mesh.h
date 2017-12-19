@@ -20,13 +20,15 @@
 using std::vector;
 using std::string;
 
-typedef std::shared_ptr<RectangularCavity> RectangularCavity_ptr;
+typedef std::shared_ptr<Cavity> Cavity_ptr;
 
 class Mesh {
     private:
-        RectangularCavity_ptr cavity;
+        Cavity_ptr cavity;
 
         vector <int> bins;
+
+        vector <double> binWidths;
 
         vector <double> potential;
         vector <double> Ey;
@@ -38,7 +40,7 @@ class Mesh {
 
     public:
         // constructor
-        Mesh(RectangularCavity_ptr cavIn , vector <int> binsi);
+        Mesh(Cavity_ptr cavIn , vector <int> binsi , vector<double> binwidths);
 
         // destructor
        ~Mesh() {}; 
@@ -55,7 +57,7 @@ class Mesh {
         void relax();
 
         // Electric field
-        void calculateE(vector <double> binWidths);
+        void calculateE();
 
         // functions for operations on grid
         int ijk2n(int i , int j, int k);
