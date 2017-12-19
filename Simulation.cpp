@@ -1,11 +1,11 @@
 #include "Mesh.h"
 #include <time.h>       /* clock_t, clock, CLOCKS_PER_SEC */
-
+#include <sstream>
 
 int main() {
+
     clock_t t;
 
-    
     vector <double> binWidths;
     vector <double> cavityDimensions = { 1.0  , 1.0 , 1.0 }; // rectangular cavity
     vector <int>    bins             = { 50   , 50 , 50 }; // number of bins in each dimension
