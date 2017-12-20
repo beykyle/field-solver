@@ -24,7 +24,8 @@ string_code hashit (std::string const& inString) {
 
 
 // Constructrs
-Mesh::Mesh(RectangularCavity_ptr cavIn , vector<int> binsi) {
+Mesh::Mesh(Cavity_ptr cavIn , vector<int> binsi , vector <double> binwidths) {
+    binWidths = binwidths;
     bins = binsi;
     cavity = cavIn;
 
@@ -84,7 +85,7 @@ void Mesh::solve(string method) {
 };
 
 
-void Mesh::calculateE(vector <double> binWidths) {
+void Mesh::calculateE() {
     
     int i , j , k;
     

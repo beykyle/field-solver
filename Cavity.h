@@ -22,44 +22,39 @@ using std::vector;
 using std::string;
 
 class Cavity {
-    private:
+    protected:
         string name;
+        
+        vector <double> dimensions;
+        vector <double> boundaryPotentials;
+        vector <bool>   holdPotentials;
 
     public:
-        Cavity(string namei ): name(namei) {};
+        Cavity(string namei , vector <double> lens , vector <double> pots , vector <bool> hold): 
+            name(namei), dimensions(lens), boundaryPotentials(pots), holdPotentials(hold) {};
        ~Cavity() {};
 
-       // get/set
-       string getName() { return(name); }; 
+        // get/set
+        string getName() { return(name); }; 
+       
+        vector <double>  getLens() { return(dimensions);               };
+        vector <double>  getPots() { return(boundaryPotentials); };
+        vector <bool>    getHold() { return(holdPotentials);     };
 
-       // interface with mesh
-       virtual void boundaries2Mesh(vector <int> bins , vector <double> &boundaries , vector <double> &potential) {};
-           
+        void setDims( vector <double> lens) { dimensions         = lens; };
+        void setPots( vector <double> pots) { boundaryPotentials = pots; };
+        void setHold( vector <bool>   hold) { holdPotentials     = hold; };
+
+        // interface with mesh
+        virtual void boundaries2Mesh(vector <int> bins , vector <bool> &geoBoundaries , vector <bool> &boundaries, 
+                             vector <double> &potential);
 };
 
 class RectangularCavity : public Cavity {
-    private:
-        // rectangle side lengths
-        vector <double> lens;
-
-        // boundary conditions
-        double topPotential;
-        double bottomPotential;
-        double leftPotential;
-        double rightPotential;
-        double nearPotential;
-        double farPotential;
-        
-        bool topPotentialHold;
-        bool bottomPotentialHold;
-        bool leftPotentialHold;
-        bool rightPotentialHold;
-        bool nearPotentialHold;
-        bool farPotentialHold;
-        
     public:
         // constructors
-        RectangularCavity(string namei, vector <double> lensi): Cavity(namei) , lens(lensi) {};
+        RectangularCavity(string namei , vector <double> lens , vector <double> pots , vector <bool> hold): 
+            Cavity(namei , lens, pots, hold) {};
 
         // destructor
         ~RectangularCavity() {};
@@ -68,24 +63,21 @@ class RectangularCavity : public Cavity {
         void boundaries2Mesh(vector <int> bins , vector <bool> &geoBoundaries , vector <bool> &boundaries, 
                              vector <double> &potential);
         
-        // get/set functions
-            // get/set rectangle side lengths
-        vector <double>  getLens() { return(lens); };
+};
 
-            // get/set boundary conditions
-        void setTopPotential(double in)     { topPotential    = in; topPotentialHold     = true;   };
-        void setBottomPotential(double in)  { bottomPotential = in; bottomPotentialHold  = true;  };
-        void setLeftPotential(double in)    { leftPotential   = in; leftPotentialHold    = true;  };
-        void setRightPotential(double in)   { rightPotential  = in; rightPotentialHold   = true;  };
-        void setNearPotential(double in)    { nearPotential   = in; nearPotentialHold    = true;  };
-        void setFarPotential(double in)     { farPotential    = in; farPotentialHold     = true;  };
+class CylindricalCavity : public Cavity {
+    public:
+        // constructors
+        CylindricalCavity(string namei , vector <double> lens , vector <double> pots , vector <bool> hold): 
+            Cavity(namei , lens, pots, hold) {};
 
-        double getTopPotential()            { return(topPotential);    };
-        double getBottomPotential()         { return(bottomPotential); };
-        double getLeftPotential()           { return(leftPotential);   };
-        double getRightPotential()          { return(rightPotential);  };
-        double getNearPotential()           { return(nearPotential);   };
-        double getFarPotential()            { return(farPotential);    };
+        // destructor
+        ~CylindricalCavity() {};
+     
+        // sets boundary conditions on mesh
+        void boundaries2Mesh(vector <int> bins , vector <bool> &geoBoundaries , vector <bool> &boundaries, 
+                             vector <double> &potential);
         
 };
+
 #endif
